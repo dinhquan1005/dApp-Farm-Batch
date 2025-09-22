@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farm Tracker dApp</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6/dist/ethers.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Farm Tracker dApp</h1>
+    <button id="connectBtn">Kết nối MetaMask</button>
+    <p id="account">Chưa kết nối</p>
+    <p id="network">Network: Chưa kết nối</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Thêm Farm mới</h2>
+      <input type="text" id="gps" placeholder="GPS (ví dụ: 12.345,67.890)">
+      <input type="text" id="product" placeholder="Loại nông sản (ví dụ: Lúa)">
+      <button id="addFarmBtn">Thêm Farm</button>
+      <h3>Danh sách Farm</h3>
+      <div id="farmList"></div>
+    </section>
+
+    <section>
+      <h2>Thêm Batch mới</h2>
+      <input type="number" id="farmId" placeholder="ID Farm">
+      <input type="text" id="sowDate" placeholder="Ngày gieo (YYYY-MM-DD)">
+      <input type="text" id="harvestDate" placeholder="Ngày thu hoạch (YYYY-MM-DD)">
+      <input type="text" id="fertilizer" placeholder="Phân bón">
+      <input type="text" id="pesticide" placeholder="Thuốc BVTV">
+      <input type="text" id="qr" placeholder="QR Code">
+      <button id="addBatchBtn">Thêm Batch</button>
+      <h3>Danh sách Batch</h3>
+      <div id="batchList"></div>
+    </section>
+  </main>
+
+  <script src="main.js"></script>
+</body>
+</html>

@@ -1,44 +1,167 @@
 <!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Farm Tracker dApp</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6/dist/ethers.min.js"></script>
-</head>
-<body>
-  <header>
-    <h1>Farm Tracker dApp</h1>
-    <button id="connectBtn">Kết nối MetaMask</button>
-    <p id="account">Chưa kết nối</p>
-    <p id="network">Network: Chưa kết nối</p>
-  </header>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agritrace Zero - Minh bạch từ ruộng đến bàn ăn</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-  <main>
-    <section>
-      <h2>Thêm Farm mới</h2>
-      <input type="text" id="gps" placeholder="GPS (ví dụ: 12.345,67.890)">
-      <input type="text" id="product" placeholder="Loại nông sản (ví dụ: Lúa)">
-      <button id="addFarmBtn">Thêm Farm</button>
-      <h3>Danh sách Farm</h3>
-      <div id="farmList"></div>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f0fdf4;
+        color: #166534;
+      }
+
+      /* Thanh điều hướng */
+      nav {
+        background: #fff;
+        padding: 16px 24px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 20px;
+        font-weight: bold;
+        color: #15803d;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 20px;
+      }
+
+      .nav-links a {
+        text-decoration: none;
+        color: #166534;
+        font-weight: 500;
+        padding: 6px 12px;
+        border-radius: 4px;
+        transition: background 0.2s;
+      }
+
+      .nav-links a:hover {
+        background: #dcfce7;
+      }
+
+      /* Nội dung chính */
+      .hero {
+        max-width: 800px;
+        margin: 40px auto;
+        text-align: center;
+        padding: 0 20px;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        color: #15803d;
+      }
+
+      .hero p {
+        font-size: 1.2rem;
+        line-height: 1.6;
+        margin-bottom: 30px;
+        color: #374151;
+      }
+
+      /* Form đăng ký (giữ lại như tính năng phụ) */
+      .container {
+        max-width: 400px;
+        margin: 40px auto;
+        background: #fff;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .container h2 {
+        color: #15803d;
+        margin-bottom: 16px;
+        text-align: center;
+      }
+
+      input,
+      button {
+        width: 100%;
+        margin: 8px 0;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+      }
+
+      button {
+        background: #22c55e;
+        color: #fff;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      button:hover {
+        background: #16a34a;
+      }
+
+      /* Footer */
+      footer {
+        text-align: center;
+        padding: 20px;
+        color: #6b7280;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Thanh điều hướng -->
+    <nav>
+      <div class="nav-container">
+        <div class="logo">Agritrace Zero</div>
+        <div class="nav-links">
+          <a href="index.html">Trang chủ</a>
+          <a href="trang-trai.html">Trang trại</a>
+          <a href="marketplace-p2p.html">Marketplace P2P</a>
+          <a href="thong-bao.html">Thông báo</a>
+          <a href="ho-so.html">Hồ sơ</a>
+          <a href="qr-code.html">QR Code</a>
+          <a href="ng-nhp.html">Đăng nhập</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Phần giới thiệu chính -->
+    <section class="hero">
+      <h1>Minh bạch từ ruộng đến bàn ăn</h1>
+      <p>Chỉ với một cú quét QR, bạn có thể truy xuất toàn bộ hành trình của nông sản — từ trang trại, qua chế biến, đến tay người tiêu dùng. Dựa trên công nghệ Blockchain, mọi thông tin đều không thể giả mạo.</p>
     </section>
 
-    <section>
-      <h2>Thêm Batch mới</h2>
-      <input type="number" id="farmId" placeholder="ID Farm">
-      <input type="text" id="sowDate" placeholder="Ngày gieo (YYYY-MM-DD)">
-      <input type="text" id="harvestDate" placeholder="Ngày thu hoạch (YYYY-MM-DD)">
-      <input type="text" id="fertilizer" placeholder="Phân bón">
-      <input type="text" id="pesticide" placeholder="Thuốc BVTV">
-      <input type="text" id="qr" placeholder="QR Code">
-      <button id="addBatchBtn">Thêm Batch</button>
-      <h3>Danh sách Batch</h3>
-      <div id="batchList"></div>
-    </section>
-  </main>
+    <!-- Form đăng ký trang trại (tùy chọn giữ lại) -->
+    <div class="container">
+      <h2>Đăng ký Trang trại</h2>
+      <input placeholder="Tên chủ trang trại" />
+      <input placeholder="GPS (lat,long)" />
+      <input placeholder="Loại nông sản" />
+      <button>Đăng ký</button>
+    </div>
 
-  <script src="main.js"></script>
-</body>
+    <!-- Footer -->
+    <footer>
+      <p>Designed with Canva • © 2025 Agritrace Zero</p>
+    </footer>
+  </body>
 </html>

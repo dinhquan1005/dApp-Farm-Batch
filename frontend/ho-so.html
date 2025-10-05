@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hồ sơ</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f0fdf4;
+      color: #166534;
+      padding-bottom: 20px; /* tránh footer bị che */
+    }
+
+    .header {
+      background: white;
+      padding: 12px 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .header nav ul {
+      list-style: none;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center; /* căn giữa trên mobile */
+    }
+
+    .header nav a {
+      text-decoration: none;
+      color: #166534;
+      font-weight: 500;
+      font-size: 14px;
+      padding: 6px 8px;
+      min-width: 80px; /* tránh nút quá nhỏ */
+      text-align: center;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #15803d;
+      text-align: center;
+      font-size: 1.6rem;
+    }
+
+    .profile-item {
+      margin: 12px 0;
+      padding: 8px 0;
+      font-size: 16px;
+    }
+
+    .dropdown {
+      margin: 16px 0;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .dropdown-header {
+      padding: 14px;
+      background: #f0fdf4;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+    }
+
+    .dropdown-content {
+      padding: 14px;
+      display: none;
+      font-size: 15px;
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+    }
+
+    button {
+      background: #22c55e;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      width: 100%; /* full width trên mobile */
+      margin-top: 16px;
+    }
+
+    button:hover {
+      background: #16a34a;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      padding: 16px 20px;
+      color: #6b7280;
+      font-size: 0.85rem;
+      max-width: 600px;
+      margin: 30px auto 0;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* Responsive: trên màn hình nhỏ */
+    @media (max-width: 600px) {
+      .header nav ul {
+        gap: 8px;
+      }
+      .header nav a {
+        font-size: 13px;
+        min-width: auto;
+        padding: 6px 4px;
+      }
+      .container {
+        margin: 16px;
+        padding: 16px;
+      }
+      h2 {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <nav>
+      <ul>
+        <li><a href="index.html">Trang chủ</a></li>
+        <li><a href="trang-trai.html">Trang trại</a></li>
+        <li><a href="marketplace-p2p.html">Marketplace</a></li>
+        <li><a href="thong-bao.html">Thông báo</a></li>
+        <li><a href="ho-so.html">Hồ sơ</a></li>
+        <li><a href="qr-code.html">QR Code</a></li>
+        <li><a href="ng-nhp.html" id="authBtn">Đăng nhập</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="container">
+    <h2>Hồ sơ người dùng</h2>
+    <div id="profile"></div>
+
+    <!-- Dropdown: Thông tin trang trại -->
+    <div class="dropdown" id="farmInfo">
+      <div class="dropdown-header">
+        <span>Thông tin trang trại</span>
+        <span>▼</span>
+      </div>
+      <div class="dropdown-content">
+        <div><b>Tên:</b> Nông trại Xanh</div>
+        <div><b>Địa chỉ:</b> Lâm Đồng</div>
+        <div><b>Loại:</b> Rau hữu cơ</div>
+      </div>
+    </div>
+
+    <!-- Dropdown: Quản lý tài khoản -->
+    <div class="dropdown" id="accountMgmt">
+      <div class="dropdown-header">
+        <span>Quản lý tài khoản</span>
+        <span>▼</span>
+      </div>
+      <div class="dropdown-content">
+        <div>Đổi mật khẩu</div>
+        <div>Cập nhật email</div>
+        <div>Liên kết ví Blockchain</div>
+      </div>
+    </div>
+
+    <button onclick="logout()">Đăng xuất</button>
+  </section>
+
+  <footer>
+    <span>Terms & Support</span>
+    <span>Designed with Canva</span>
+  </footer>
+
+  <script>
+    // === HÀM HỖ TRỢ QUẢN LÝ NGƯỜI DÙNG ===
+    function isLoggedIn() {
+      return localStorage.getItem('isLoggedIn') === 'true';
+    }
+
+    function getUser() {
+      const userStr = localStorage.getItem('user');
+      return userStr ? JSON.parse(userStr) : null;
+    }
+
+    function logout() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('user');
+      alert('Đã đăng xuất!');
+      window.location.href = 'ng-nhp.html';
+    }
+
+    function requireLogin() {
+      if (!isLoggedIn()) {
+        alert('Vui lòng đăng nhập để xem hồ sơ!');
+        window.location.href = 'ng-nhp.html';
+      }
+    }
+
+    // === KHỞI TẠO TRANG ===
+    document.addEventListener('DOMContentLoaded', () => {
+      requireLogin();
+      
+      const user = getUser();
+      const profileDiv = document.getElementById('profile');
+      
+      if (user) {
+        profileDiv.innerHTML = `
+          <div class="profile-item"><b>Tên:</b> ${user.name || 'Chưa cập nhật'}</div>
+          <div class="profile-item"><b>Email:</b> ${user.email || 'Chưa cập nhật'}</div>
+          <div class="profile-item"><b>SĐT:</b> ${user.phone || 'Chưa cập nhật'}</div>
+        `;
+      } else {
+        profileDiv.innerHTML = '<div>Không có thông tin người dùng.</div>';
+      }
+
+      // Cập nhật nút đăng nhập/đăng xuất
+      const authBtn = document.getElementById('authBtn');
+      if (isLoggedIn()) {
+        authBtn.textContent = 'Đăng xuất';
+        authBtn.onclick = (e) => {
+          e.preventDefault();
+          logout();
+        };
+      }
+
+      // === KÍCH HOẠT DROPDOWN ===
+      document.querySelectorAll('.dropdown-header').forEach(header => {
+        header.addEventListener('click', () => {
+          const dropdown = header.parentElement;
+          dropdown.classList.toggle('active');
+        });
+      });
+    });
+  </script>
+</body>
+</html>

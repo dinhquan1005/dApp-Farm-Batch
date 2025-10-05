@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Danh sách Trang trại - Agritrace Zero</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f0fdf4;
+      color: #166534;
+      padding-bottom: 20px;
+    }
+
+    .header {
+      background: white;
+      padding: 12px 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .header nav ul {
+      list-style: none;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .header nav a {
+      text-decoration: none;
+      color: #166534;
+      font-weight: 500;
+      font-size: 13px;
+      padding: 6px 8px;
+      text-align: center;
+      min-width: 70px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+
+    h2 {
+      margin: 20px 0;
+      color: #15803d;
+      text-align: center;
+      font-size: 1.6rem;
+    }
+
+    /* Thanh tìm kiếm */
+    .search-bar {
+      margin: 20px 0;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 16px; /* tránh zoom trên iOS */
+      background: white;
+    }
+
+    /* Danh sách trang trại */
+    .card-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+
+    .card {
+      background: #fdf7e6; /* Nền be nhạt */
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .info {
+      background: #f0fdf4; /* Ô bo tròn màu nâu nhạt */
+      padding: 10px 14px;
+      margin: 10px 0;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    .info b {
+      color: #15803d;
+    }
+
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: #6b7280;
+      padding: 24px;
+      font-size: 15px;
+    }
+
+    /* Responsive nhỏ */
+    @media (max-width: 480px) {
+      .card-list {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .card {
+        max-width: none;
+        padding: 18px;
+      }
+      .info {
+        padding: 9px 12px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <nav>
+      <ul>
+        <li><a href="index.html">Trang chủ</a></li>
+        <li><a href="trang-trai.html">Trang trại</a></li>
+        <li><a href="marketplace-p2p.html">Marketplace</a></li>
+        <li><a href="thong-bao.html">Thông báo</a></li>
+        <li><a href="ho-so.html">Hồ sơ</a></li>
+        <li><a href="qr-code.html">QR Code</a></li>
+        <li><a href="ng-nhp.html" id="authBtn">Đăng nhập</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="container">
+    <h2>Danh sách trang trại</h2>
+
+    <div class="search-bar">
+      <input type="text" id="farmSearch" placeholder="Tìm theo tên, chủ, địa điểm, loại hoặc ID...">
+    </div>
+
+    <div class="card-list" id="farmList"></div>
+  </section>
+
+  <script>
+    const farms = [
+      { id: "FARM001", name: "Nông trại Xanh", owner: "Nguyễn Văn A", location: "Lâm Đồng", crop: "Rau hữu cơ" },
+      { id: "FARM002", name: "Trang trại An Khang", owner: "Trần Thị B", location: "Đồng Tháp", crop: "Lúa gạo" },
+      { id: "FARM003", name: "HTX Rau Sạch Sóc Trăng", owner: "Lê Văn C", location: "Sóc Trăng", crop: "Rau muống" },
+      { id: "FARM004", name: "Nông trại Phú Yên", owner: "Phạm Thị D", location: "Phú Yên", crop: "Khoai lang Nhật" },
+      { id: "FARM005", name: "Trang trại Lâm Đồng Organic", owner: "Hoàng Văn E", location: "Lâm Đồng", crop: "Cà chua" }
+    ];
+
+    function isLoggedIn() {
+      return localStorage.getItem('isLoggedIn') === 'true';
+    }
+
+    function logout() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('user');
+      alert('Đã đăng xuất!');
+      window.location.href = 'ng-nhp.html';
+    }
+
+    function renderFarms(keyword = "") {
+      const filtered = farms.filter(farm =>
+        farm.name.toLowerCase().includes(keyword.toLowerCase()) ||
+        farm.owner.toLowerCase().includes(keyword.toLowerCase()) ||
+        farm.location.toLowerCase().includes(keyword.toLowerCase()) ||
+        farm.crop.toLowerCase().includes(keyword.toLowerCase()) ||
+        farm.id.includes(keyword)
+      );
+
+      const list = document.getElementById('farmList');
+      if (filtered.length === 0) {
+        list.innerHTML = '<div class="no-results">Không tìm thấy trang trại</div>';
+        return;
+      }
+
+      list.innerHTML = filtered.map(f => `
+        <div class="card">
+          <div class="info"><b>Tên:</b> ${f.name}</div>
+          <div class="info"><b>Chủ:</b> ${f.owner}</div>
+          <div class="info"><b>Địa điểm:</b> ${f.location}</div>
+          <div class="info"><b>Loại:</b> ${f.crop}</div>
+          <div class="info"><b>ID:</b> ${f.id}</div>
+        </div>
+      `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const authBtn = document.getElementById('authBtn');
+      if (isLoggedIn()) {
+        authBtn.textContent = 'Đăng xuất';
+        authBtn.onclick = (e) => {
+          e.preventDefault();
+          logout();
+        };
+      }
+
+      renderFarms();
+      document.getElementById('farmSearch').addEventListener('input', (e) => {
+        renderFarms(e.target.value);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thông báo - Agritrace Zero</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f0fdf4;
+      color: #166534;
+      padding-bottom: 20px;
+    }
+
+    .header {
+      background: white;
+      padding: 12px 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .header nav ul {
+      list-style: none;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .header nav a {
+      text-decoration: none;
+      color: #166534;
+      font-weight: 500;
+      font-size: 13px;
+      padding: 6px 8px;
+      text-align: center;
+      min-width: 70px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+
+    h2 {
+      margin: 20px 0;
+      color: #15803d;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: center;
+      font-size: 1.6rem;
+    }
+
+    h2::before {
+      content: "🔔";
+      font-size: 1.5rem;
+    }
+
+    /* Thanh tìm kiếm - tối ưu mobile */
+    .search-bar {
+      margin: 20px 0;
+      position: relative;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 14px 16px 14px 48px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 16px; /* tránh zoom trên iOS */
+      background: white;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6b7280;
+      font-size: 18px;
+    }
+
+    /* Danh sách thông báo */
+    #notificationList {
+      list-style: none;
+      margin-top: 20px;
+    }
+
+    .notification-item {
+      background: white;
+      padding: 18px;
+      margin-bottom: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .bell-icon {
+      font-size: 1.4rem;
+      color: #22c55e;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .notification-content {
+      flex: 1;
+    }
+
+    .notification-text {
+      margin-bottom: 8px;
+      line-height: 1.5;
+      font-size: 15px;
+    }
+
+    .notification-time {
+      color: #6b7280;
+      font-size: 0.85rem;
+    }
+
+    .no-results {
+      text-align: center;
+      color: #6b7280;
+      padding: 24px;
+      font-size: 15px;
+    }
+
+    /* Responsive nhỏ */
+    @media (max-width: 480px) {
+      .notification-item {
+        padding: 16px;
+        gap: 12px;
+      }
+      .bell-icon {
+        font-size: 1.3rem;
+      }
+      .notification-text {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <nav>
+      <ul>
+        <li><a href="index.html">Trang chủ</a></li>
+        <li><a href="trang-trai.html">Trang trại</a></li>
+        <li><a href="marketplace-p2p.html">Marketplace</a></li>
+        <li><a href="thong-bao.html">Thông báo</a></li>
+        <li><a href="ho-so.html">Hồ sơ</a></li>
+        <li><a href="qr-code.html">QR Code</a></li>
+        <li><a href="ng-nhp.html" id="authBtn">Đăng nhập</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="container">
+    <h2>Thông báo</h2>
+
+    <!-- Thanh tìm kiếm -->
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Tìm kiếm thông báo...">
+    </div>
+
+    <!-- Danh sách thông báo -->
+    <ul id="notificationList"></ul>
+  </section>
+
+  <script>
+    const notifications = [
+      { text: "Đơn hàng #1023 đã được xác nhận", time: "30 phút trước" },
+      { text: "Trang trại của bạn vừa được thêm vào Marketplace", time: "2 giờ trước" },
+      { text: "Hệ thống đã cập nhật blockchain cho lô rau muống #R001", time: "Hôm qua" },
+      { text: "Bạn có 1 yêu cầu kết nối từ người tiêu dùng", time: "Hôm qua" },
+      { text: "Chúc mừng! Tài khoản của bạn đã được xác minh", time: "2 ngày trước" }
+    ];
+
+    function isLoggedIn() {
+      return localStorage.getItem('isLoggedIn') === 'true';
+    }
+
+    function logout() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('user');
+      alert('Đã đăng xuất!');
+      window.location.href = 'ng-nhp.html';
+    }
+
+    function renderNotifications(keyword = "") {
+      const filtered = notifications.filter(n =>
+        n.text.toLowerCase().includes(keyword.toLowerCase()) ||
+        n.time.toLowerCase().includes(keyword.toLowerCase())
+      );
+
+      const list = document.getElementById('notificationList');
+      if (filtered.length === 0) {
+        list.innerHTML = '<li class="no-results">Không tìm thấy thông báo</li>';
+        return;
+      }
+
+      list.innerHTML = filtered.map(n => `
+        <li class="notification-item">
+          <div class="bell-icon">🔔</div>
+          <div class="notification-content">
+            <div class="notification-text">${n.text}</div>
+            <div class="notification-time">${n.time}</div>
+          </div>
+        </li>
+      `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const authBtn = document.getElementById('authBtn');
+      if (isLoggedIn()) {
+        authBtn.textContent = 'Đăng xuất';
+        authBtn.onclick = (e) => {
+          e.preventDefault();
+          logout();
+        };
+      }
+
+      renderNotifications();
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        renderNotifications(e.target.value);
+      });
+    });
+  </script>
+</body>
+</html>

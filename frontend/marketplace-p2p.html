@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketplace P2P</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f0fdf4;
+      color: #166534;
+      padding-bottom: 20px;
+    }
+
+    .header {
+      background: white;
+      padding: 12px 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .header nav ul {
+      list-style: none;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .header nav a {
+      text-decoration: none;
+      color: #166534;
+      font-weight: 500;
+      font-size: 13px;
+      padding: 6px 8px;
+      text-align: center;
+      min-width: 70px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+
+    h2 {
+      margin: 20px 0;
+      color: #15803d;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      font-size: 1.6rem;
+    }
+
+    h2::before {
+      content: "🛒";
+      font-size: 1.5rem;
+    }
+
+    /* Form tìm kiếm: trên mobile → 1 cột */
+    .search-form {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .search-form input {
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px; /* tránh zoom trên iOS */
+    }
+
+    /* Danh sách sản phẩm */
+    .card-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+
+    .card {
+      background: white;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .info {
+      margin: 8px 0;
+      font-size: 15px;
+    }
+
+    button {
+      background: #22c55e;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      width: 100%;
+      margin-top: 12px;
+    }
+
+    button:hover {
+      background: #16a34a;
+    }
+
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: #6b7280;
+      padding: 20px;
+    }
+
+    /* Responsive: desktop vẫn giữ 4 cột tìm kiếm */
+    @media (min-width: 768px) {
+      .search-form {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .header nav a {
+        font-size: 15px;
+        min-width: auto;
+      }
+      .card-list {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <nav>
+      <ul>
+        <li><a href="index.html">Trang chủ</a></li>
+        <li><a href="trang-trai.html">Trang trại</a></li>
+        <li><a href="marketplace-p2p.html">Marketplace</a></li>
+        <li><a href="thong-bao.html">Thông báo</a></li>
+        <li><a href="ho-so.html">Hồ sơ</a></li>
+        <li><a href="qr-code.html">QR Code</a></li>
+        <li><a href="ng-nhp.html" id="authBtn">Đăng nhập</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="container">
+    <h2>Marketplace P2P</h2>
+
+    <!-- Form tìm kiếm 4 trường -->
+    <div class="search-form">
+      <input type="text" id="searchName" placeholder="Tên sản phẩm">
+      <input type="text" id="searchType" placeholder="Loại sản phẩm">
+      <input type="text" id="searchFarm" placeholder="Trang trại">
+      <input type="text" id="searchPrice" placeholder="Khoảng giá (VD: 10000-50000)">
+    </div>
+
+    <!-- Danh sách sản phẩm -->
+    <div class="card-list" id="productList"></div>
+  </section>
+
+  <script>
+    // === DỮ LIỆU MẪU ===
+    const products = [
+      { name: "Ngô vàng", type: "Ngô", farm: "Nông trại An Khang", price: "25.000đ/kg" },
+      { name: "Rau muống", type: "Rau", farm: "Nông trại Xanh", price: "15.000đ/bó" },
+      { name: "Gạo ST25", type: "Lúa", farm: "HTX Sóc Trăng", price: "45.000đ/kg" },
+      { name: "Cà chua hữu cơ", type: "Rau", farm: "Trang trại Lâm Đồng", price: "30.000đ/kg" },
+      { name: "Khoai lang Nhật", type: "Củ", farm: "Nông trại Phú Yên", price: "20.000đ/kg" }
+    ];
+
+    // === HÀM HỖ TRỢ ĐĂNG NHẬP ===
+    function isLoggedIn() {
+      return localStorage.getItem('isLoggedIn') === 'true';
+    }
+
+    function logout() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('user');
+      alert('Đã đăng xuất!');
+      window.location.href = 'ng-nhp.html';
+    }
+
+    // === LỌC SẢN PHẨM ===
+    function renderProducts() {
+      const name = document.getElementById('searchName').value.toLowerCase();
+      const type = document.getElementById('searchType').value.toLowerCase();
+      const farm = document.getElementById('searchFarm').value.toLowerCase();
+      const priceRange = document.getElementById('searchPrice').value;
+
+      const filtered = products.filter(product => {
+        const matchName = product.name.toLowerCase().includes(name);
+        const matchType = product.type.toLowerCase().includes(type);
+        const matchFarm = product.farm.toLowerCase().includes(farm);
+        let matchPrice = true;
+
+        if (priceRange.includes('-')) {
+          const [minStr, maxStr] = priceRange.split('-').map(s => s.trim());
+          const min = parseFloat(minStr.replace(/\D/g, ''));
+          const max = parseFloat(maxStr.replace(/\D/g, ''));
+          const prodPrice = parseFloat(product.price.replace(/\D/g, ''));
+          matchPrice = prodPrice >= min && prodPrice <= max;
+        }
+
+        return matchName && matchType && matchFarm && matchPrice;
+      });
+
+      const list = document.getElementById('productList');
+      if (filtered.length === 0) {
+        list.innerHTML = '<p class="no-results">Không tìm thấy sản phẩm</p>';
+        return;
+      }
+
+      list.innerHTML = filtered.map(p => `
+        <div class="card">
+          <div class="info"><b>${p.name}</b></div>
+          <div class="info">Loại: ${p.type}</div>
+          <div class="info">Trang trại: ${p.farm}</div>
+          <div class="info">Giá: ${p.price}</div>
+          <button>Thêm vào giỏ</button>
+        </div>
+      `).join('');
+    }
+
+    // === KHỞI TẠO ===
+    document.addEventListener('DOMContentLoaded', () => {
+      const authBtn = document.getElementById('authBtn');
+      if (isLoggedIn()) {
+        authBtn.textContent = 'Đăng xuất';
+        authBtn.onclick = (e) => {
+          e.preventDefault();
+          logout();
+        };
+      }
+
+      ['searchName', 'searchType', 'searchFarm', 'searchPrice'].forEach(id => {
+        document.getElementById(id).addEventListener('input', renderProducts);
+      });
+
+      renderProducts();
+    });
+  </script>
+</body>
+</html>

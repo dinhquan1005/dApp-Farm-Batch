@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập - Agritrace Zero</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f0fdf4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .login-container {
+      display: flex;
+      max-width: 800px;
+      width: 100%;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    /* Phần logo */
+    .logo-section {
+      background: #15803d;
+      color: white;
+      padding: 40px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      flex: 1;
+    }
+
+    .logo-section h1 {
+      font-size: 1.8rem;
+      margin-top: 16px;
+    }
+
+    .logo-section p {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin-top: 10px;
+    }
+
+    /* Phần form */
+    .form-section {
+      padding: 40px 30px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-section h2 {
+      color: #15803d;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    input {
+      padding: 14px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px; /* tránh zoom trên iOS */
+    }
+
+    button {
+      background: #22c55e;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 14px;
+    }
+
+    button:hover {
+      background: #16a34a;
+    }
+
+    .register-btn {
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #22c55e;
+    }
+
+    .register-btn:hover {
+      background: #dcfce7;
+    }
+
+    .error {
+      color: red;
+      margin-bottom: 16px;
+      min-height: 20px;
+      text-align: center;
+    }
+
+    .forgot-password {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .forgot-password a {
+      color: #15803d;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    /* Đăng nhập nhanh */
+    .social-login {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .social-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .fb { background: #3b5998; color: white; }
+    .ig { 
+      background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); 
+      color: white; 
+    }
+    .gg { background: #db4437; color: white; }
+
+    /* ✅ TỐI ƯU CHO MOBILE: Chuyển sang 1 cột */
+    @media (max-width: 768px) {
+      .login-container {
+        flex-direction: column;
+      }
+
+      .logo-section,
+      .form-section {
+        flex: none;
+        width: 100%;
+        padding: 30px 20px;
+      }
+
+      .logo-section {
+        order: 2; /* Đẩy logo xuống dưới form trên mobile */
+      }
+
+      .form-section {
+        order: 1;
+        padding-bottom: 20px;
+      }
+
+      .logo-section h1 {
+        font-size: 1.6rem;
+      }
+
+      .social-btn {
+        width: 40px;
+        height: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <!-- Logo -->
+    <div class="logo-section">
+      <div style="font-size: 2.5rem;">🌱</div>
+      <h1>Agritrace Zero</h1>
+      <p>Minh bạch từ ruộng đến bàn ăn</p>
+    </div>
+
+    <!-- Form -->
+    <div class="form-section">
+      <h2>Đăng nhập</h2>
+      <div id="loginError" class="error"></div>
+
+      <input type="text" id="email" placeholder="Email hoặc số điện thoại">
+      <input type="password" id="password" placeholder="Mật khẩu">
+
+      <div class="forgot-password">
+        <a href="#">Quên mật khẩu?</a>
+      </div>
+
+      <button onclick="login()">Đăng nhập</button>
+      <button class="register-btn" onclick="window.location.href='#'">Đăng ký</button>
+
+      <div class="social-login">
+        <div class="social-btn fb">f</div>
+        <div class="social-btn ig">i</div>
+        <div class="social-btn gg">G</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const userMock = {
+      email: "user@example.com",
+      password: "123456",
+      name: "Nguyễn Văn A",
+      phone: "0909123456"
+    };
+
+    function isLoggedIn() {
+      return localStorage.getItem('isLoggedIn') === 'true';
+    }
+
+    function setUser(user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    }
+
+    function login() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const errorDiv = document.getElementById('loginError');
+
+      if (email === userMock.email && password === userMock.password) {
+        localStorage.setItem('isLoggedIn', 'true');
+        setUser(userMock);
+        window.location.href = 'index.html';
+      } else {
+        errorDiv.innerText = 'Sai email hoặc mật khẩu!';
+      }
+    }
+
+    if (isLoggedIn()) {
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>

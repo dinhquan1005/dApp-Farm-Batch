@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Code - Agritrace Zero</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f0fdf4;
+      color: #166534;
+      padding-bottom: 80px; /* tránh nút ? bị che */
+    }
+
+    .header {
+      background: white;
+      padding: 12px 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .header nav ul {
+      list-style: none;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .header nav a {
+      text-decoration: none;
+      color: #166534;
+      font-weight: 500;
+      font-size: 13px;
+      padding: 6px 8px;
+      text-align: center;
+      min-width: 70px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 0 16px;
+      text-align: center;
+    }
+
+    h2 {
+      margin: 20px 0;
+      color: #15803d;
+      font-size: 1.6rem;
+    }
+
+    /* Khung scan QR - tự co dãn */
+    .qr-scanner {
+      width: 80vw; /* 80% chiều rộng màn hình */
+      max-width: 280px;
+      aspect-ratio: 1/1; /* giữ tỷ lệ vuông */
+      margin: 20px auto;
+      position: relative;
+      background: rgba(0,0,0,0.03);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .corner {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border: 3px solid #000;
+    }
+    .top-left { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+    .top-right { top: 8px; right: 8px; border-left: none; border-bottom: none; }
+    .bottom-left { bottom: 8px; left: 8px; border-right: none; border-top: none; }
+    .bottom-right { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+    .qr-button {
+      background: #22c55e;
+      color: white;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 16px 0;
+      font-size: 16px;
+      width: 80%;
+      max-width: 300px;
+    }
+
+    .qr-button:hover {
+      background: #16a34a;
+    }
+
+    .action-buttons {
+      margin: 20px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .action-buttons button {
+      background: white;
+      color: #166534;
+      border: 1px solid #ccc;
+      padding: 12px 16px;
+      margin: 0;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 15px;
+      min-width: 140px;
+      flex: 1;
+      max-width: 200px;
+    }
+
+    .action-buttons button:hover {
+      background: #dcfce7;
+    }
+
+    #qrHistory {
+      margin-top: 20px;
+      padding: 16px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: none;
+    }
+
+    #qrHistory.show {
+      display: block;
+    }
+
+    .help-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #f5eee6;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .help-btn:hover {
+      background: #e0d3c5;
+    }
+
+    /* Responsive nhỏ hơn */
+    @media (max-width: 400px) {
+      .qr-scanner {
+        width: 90vw;
+        max-width: 240px;
+      }
+      .action-buttons button {
+        min-width: 120px;
+        padding: 10px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <nav>
+      <ul>
+        <li><a href="index.html">Trang chủ</a></li>
+        <li><a href="trang-trai.html">Trang trại</a></li>
+        <li><a href="marketplace-p2p.html">Marketplace</a></li>
+        <li><a href="thong-bao.html">Thông báo</a></li>
+        <li><a href="ho-so.html">Hồ sơ</a></li>
+        <li><a href="qr-code.html">QR Code</a></li>
+        <li><a href="ng-nhp.html" id="authBtn">Đăng nhập</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="container">
+    <h2>Scan QR Page</h2>
+
+    <div class="qr-scanner">
+      <div class="corner top-left"></div>
+      <div class="corner top-right"></div>
+      <div class="corner bottom-left"></div>
+      <div class="corner bottom-right"></div>
+    </div>
+
+    <button class="qr-button" onclick="alert('Đây là QR code cá nhân của bạn!')">QR của bạn</button>
+
+    <div class="action-buttons">
+      <button onclick="chooseQR()">Chọn ảnh mã QR</button>
+      <button onclick="showHistory()">Lịch sử</button>
+    </div>
+
+    <div id="qrHistory"></div>
+  </section>
+
+  <div class="help-btn" title="Trợ giúp" onclick="alert('Hướng dẫn:\n1. Đặt mã QR vào khung scan.\n2. Hoặc chọn ảnh QR từ thư viện.\n3. Lịch sử sẽ được lưu tự động.')">?</div>
+
+  <script>
+    function isLoggedIn() {
+      return localStorage.getItem('isLoggedIn') === 'true';
+    }
+
+    function logout() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('user');
+      alert('Đã đăng xuất!');
+      window.location.href = 'ng-nhp.html';
+    }
+
+    function chooseQR() {
+      alert('Chức năng chọn ảnh mã QR (mô phỏng)');
+      let history = JSON.parse(localStorage.getItem('qrHistory') || '[]');
+      const newQR = `QR_${new Date().toLocaleString('vi-VN')}`;
+      history.unshift(newQR);
+      localStorage.setItem('qrHistory', JSON.stringify(history));
+    }
+
+    function showHistory() {
+      const history = JSON.parse(localStorage.getItem('qrHistory') || '[]');
+      const div = document.getElementById('qrHistory');
+      
+      if (history.length === 0) {
+        div.innerHTML = '<i>Chưa có lịch sử QR.</i>';
+      } else {
+        const list = history.map(qr => `<li>${qr}</li>`).join('');
+        div.innerHTML = `<b>Lịch sử QR đã quét:</b><ul style="text-align: left; margin-top: 12px; padding-left: 20px;">${list}</ul>`;
+      }
+      
+      div.classList.toggle('show');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const authBtn = document.getElementById('authBtn');
+      if (isLoggedIn()) {
+        authBtn.textContent = 'Đăng xuất';
+        authBtn.onclick = (e) => {
+          e.preventDefault();
+          logout();
+        };
+      }
+    });
+  </script>
+</body>
+</html>
